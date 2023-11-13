@@ -34,6 +34,7 @@ class Texttest < Formula
     #
     # The installed folder is not in the path, so use the entire path to any
     # executables being tested: `system "#{bin}/program", "do", "something"`.
-    system "false"
+    output = shell_output("#{bin}/texttest -help")
+    assert_match "TextTest didn't find any valid test applications", output
   end
 end
