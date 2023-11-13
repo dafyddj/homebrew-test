@@ -1,6 +1,3 @@
-# Documentation: https://docs.brew.sh/Formula-Cookbook
-#                https://rubydoc.brew.sh/Formula
-# PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
 class Texttest < Formula
   include Language::Python::Virtualenv
 
@@ -20,21 +17,32 @@ class Texttest < Formula
   end
 
   def install
-    # ENV.deparallelize  # if your formula fails when building in parallel
     virtualenv_install_with_resources
   end
 
   test do
-    # `test do` will create, run in and delete a temporary directory.
-    #
-    # This test will fail and we won't accept that! For Homebrew/homebrew-core
-    # this will need to be a test that verifies the functionality of the
-    # software. Run the test with `brew test TextTest`. Options passed
-    # to `brew install` such as `--HEAD` also need to be provided to `brew test`.
-    #
-    # The installed folder is not in the path, so use the entire path to any
-    # executables being tested: `system "#{bin}/program", "do", "something"`.
-    output = shell_output("#{bin}/texttest -help")
-    assert_match "TextTest didn't find any valid test applications", output
+    (testpath/"testsuite.test").write <<~EOS
+      Test1
+    EOS
+
+    (testpath/"config.test").write <<~EOS
+      executable:/bin/echo
+      filename_convention_scheme:standard
+    EOS
+
+    mkdir "Test1"
+
+    (testpath/"Test1/options.test").write <<~EOS
+      Success!
+    EOS
+
+    (testpath/"Test1/stdout.test").write <<~EOS
+      Success!
+    EOS
+
+    File.write(testpath/"Test1/stderr.test", "")
+
+    output = shell_output("#{bin}/texttest -d #{testpath} -b -a test")
+    assert_match "S: TEST test-case Test1 succeeded", output
   end
 end
